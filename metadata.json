@@ -1,0 +1,6 @@
+{
+  "name": "Perfumaria Ferraz",
+  "description": "E-commerce premium de perfumes importados, árabes e exclusivos, integrado a um painel administrativo completo e fechamento automático de pedidos via WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
