@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { ProductCard } from '../components/ProductCard';
-import { Sparkles, ArrowRight, MessageSquare } from 'lucide-react';
+import { Sparkles, ArrowRight, MessageSquare, PackageSearch } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const Home: React.FC = () => {
@@ -32,6 +32,35 @@ export const Home: React.FC = () => {
 
   return (
     <div className="space-y-16 pt-8">
+      {/* 1. ENCOMENDAS BANNER */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link to="/encomendas" className="block relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200/50 shadow-sm hover:shadow-md transition-all group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <PackageSearch size={120} className="text-amber-600" />
+          </div>
+          
+          <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1 sm:space-y-2">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-amber-600 flex items-center gap-1.5">
+                <Sparkles size={12} />
+                NOVIDADE
+              </span>
+              <h2 className="text-xl sm:text-2xl font-light tracking-widest text-slate-800 uppercase">
+                Perfumes sob Encomenda
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-lg">
+                Não encontrou o que procurava? Descubra nosso catálogo exclusivo de fragrâncias disponíveis para encomenda especial.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2 text-xs sm:text-sm font-bold text-amber-700 bg-amber-200/50 px-4 py-2.5 rounded-full uppercase tracking-wider group-hover:bg-amber-200 transition-colors shrink-0 mt-2 sm:mt-0">
+              <span>Ver Catálogo</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {/* 2. FEATURED PRODUCTS (Destaque) */}
       {isLoadingProducts ? (
         <div className="flex justify-center py-24">

@@ -173,7 +173,7 @@ export const apiService = {
           };
         });
 
-        const validProducts = mappedProducts.filter(p => p.nome && p.preço > 0);
+        const validProducts = mappedProducts.filter(p => p.nome && p.preço >= 0);
         if (validProducts.length > 0) {
           localStorage.setItem('ferraz_cached_products', JSON.stringify(validProducts));
           return validProducts;

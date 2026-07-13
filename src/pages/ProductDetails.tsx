@@ -60,6 +60,8 @@ export const ProductDetails: React.FC = () => {
   const installmentValue = currentPrice / 3;
   const pixPrice = currentPrice * 0.95;
 
+  const isPreOrder = product.preço === 0 && product.estoque === 0;
+
   // Filter similar products (same category or same brand, excluding current product)
   const similarProducts = products
     .filter(p => p.ativo && p.id !== product.id && (p.categoria === product.categoria || p.marca === product.marca))
@@ -187,7 +189,11 @@ export const ProductDetails: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-slate-400">Disponibilidade:</span>
-              {product.estoque > 0 ? (
+              {isPreOrder ? (
+                <span className="text-amber-700 bg-amber-50 px-3 py-1 rounded-full text-[10px]">
+                  Sob Encomenda
+                </span>
+              ) : product.estoque > 0 ? (
                 <span className="text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full text-[10px]">
                   {product.estoque} em estoque
                 </span>
@@ -201,7 +207,11 @@ export const ProductDetails: React.FC = () => {
 
           {/* Pricing container */}
           <div className="space-y-2">
-            {hasDiscount ? (
+            {isPreOrder ? (
+              <div className="text-3xl font-bold text-amber-600 bg-amber-50 px-4 py-2 rounded-lg w-fit">
+                SOB ENCOMENDA
+              </div>
+            ) : hasDiscount ? (
               <div className="space-y-1">
                 <span className="text-xs text-slate-400 line-through font-mono">
                   De: R$ {product.preço.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -222,15 +232,17 @@ export const ProductDetails: React.FC = () => {
             )}
 
             {/* Installment terms */}
-            <div className="text-sm text-slate-500 font-medium leading-relaxed">
-              <div className="text-[#5B8FB9] font-bold text-lg flex items-center">
-                R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no PIX
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 uppercase tracking-wider">5% de desconto</span>
+            {!isPreOrder && (
+              <div className="text-sm text-slate-500 font-medium leading-relaxed">
+                <div className="text-[#5B8FB9] font-bold text-lg flex items-center">
+                  R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no PIX
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 uppercase tracking-wider">5% de desconto</span>
+                </div>
+                <div className="text-slate-400 mt-1">
+                  ou em até <span className="font-bold text-slate-600">3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> sem juros no cartão de crédito.
+                </div>
               </div>
-              <div className="text-slate-400 mt-1">
-                ou em até <span className="font-bold text-slate-600">3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> sem juros no cartão de crédito.
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Interactive Actions - Quantity selectors and add button */}
@@ -297,13 +309,13 @@ export const ProductDetails: React.FC = () => {
           ) : (
             <div className="pt-2">
               <a
-                href={`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(`Olá! Gostaria de encomendar ou saber da previsão de estoque do perfume: ${product.nome} (${product.volume})`)}`}
+                href={`https://wa.me/${config.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(isPreOrder ? `Olá! Gostaria de encomendar o perfume: ${product.nome} (${product.volume})` : `Olá! Gostaria de saber da previsão de estoque do perfume: ${product.nome} (${product.volume})`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full h-12 bg-[#DCEEFF] text-slate-800 text-xs font-bold uppercase tracking-widest rounded-full flex items-center justify-center transition-all shadow-xs"
+                className={`w-full h-12 ${isPreOrder ? 'bg-amber-100 text-amber-800' : 'bg-[#DCEEFF] text-slate-800'} text-xs font-bold uppercase tracking-widest rounded-full flex items-center justify-center transition-all shadow-xs`}
               >
-                <MessageSquare size={14} className="mr-2 text-brand-blue-dark animate-pulse" />
-                Encomendar pelo WhatsApp
+                <MessageSquare size={14} className={`mr-2 ${isPreOrder ? 'text-amber-600' : 'text-brand-blue-dark'} animate-pulse`} />
+                {isPreOrder ? 'Encomendar pelo WhatsApp' : 'Avise-me quando chegar'}
               </a>
             </div>
           )}
