@@ -185,7 +185,6 @@ export const Catalog: React.FC = () => {
     setSearchParams({});
   };
 
-  // Filter and Sort calculation
   const filteredAndSortedProducts = useMemo(() => {
     let result = products.filter(p => p.ativo);
 

@@ -1,7 +1,7 @@
 import { Product, Order, Customer, AppConfig, PaymentMethod } from '../types';
 import { formatImageUrl } from '../utils/image';
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbwE3V6B1nr9eUuk7xxYI_1X_n2xIiOaE-SSol48PJHqr2Kvpoc5vLxKYgZ65ed1id8c/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwiieqronfc_upTUiVvO8G7W1utzh0F6ifvqNTgtHIALa_06cBPDy988cpXuwqcSswi/exec';
 
 /**
  * Robustly maps product fields to support both accented, non-accented, camelCase,
@@ -95,7 +95,7 @@ export const apiService = {
    */
   async fetchProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
