@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { ProductCard } from '../components/ProductCard';
-import { ShoppingBag, Heart, ArrowLeft, Flame, Share2, Shield, Truck, RefreshCw, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Heart, ArrowLeft, Flame, Share2, Shield, Truck, RefreshCw, MessageSquare, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const getIntensityLabel = (value: number) => {
@@ -59,8 +59,6 @@ export const ProductDetails: React.FC = () => {
   const maxInstallments = 3;
   const installmentValue = currentPrice / 3;
   const pixPrice = currentPrice * 0.95;
-
-  const isPreOrder = product.preço === 0 && product.estoque === 0;
 
   // Filter similar products (same category or same brand, excluding current product)
   const similarProducts = products
@@ -189,17 +187,14 @@ export const ProductDetails: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-slate-400">Disponibilidade:</span>
-              {isPreOrder ? (
-                <span className="text-amber-700 bg-amber-50 px-3 py-1 rounded-full text-[10px]">
-                  Sob Encomenda
-                </span>
-              ) : product.estoque > 0 ? (
-                <span className="text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full text-[10px]">
-                  {product.estoque} em estoque
+              {product.estoque > 0 ? (
+                <span className="text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full text-[10px] font-bold">
+                  A Pronta Entrega ({product.estoque} em estoque)
                 </span>
               ) : (
-                <span className="text-rose-700 bg-rose-50 px-3 py-1 rounded-full text-[10px]">
-                  Fora de Estoque
+                <span className="text-amber-800 bg-amber-50 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                  <Clock size={11} className="text-amber-600" />
+                  Sob Pedido (5 a 15 dias)
                 </span>
               )}
             </div>
@@ -207,11 +202,7 @@ export const ProductDetails: React.FC = () => {
 
           {/* Pricing container */}
           <div className="space-y-2">
-            {isPreOrder ? (
-              <div className="text-3xl font-bold text-amber-600 bg-amber-50 px-4 py-2 rounded-lg w-fit">
-                SOB ENCOMENDA
-              </div>
-            ) : hasDiscount ? (
+            {hasDiscount ? (
               <div className="space-y-1">
                 <span className="text-xs text-slate-400 line-through font-mono">
                   De: R$ {product.preço.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -232,93 +223,88 @@ export const ProductDetails: React.FC = () => {
             )}
 
             {/* Installment terms */}
-            {!isPreOrder && (
-              <div className="text-sm text-slate-500 font-medium leading-relaxed">
-                <div className="text-[#5B8FB9] font-bold text-lg flex items-center">
-                  R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no PIX
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 uppercase tracking-wider">5% de desconto</span>
-                </div>
-                <div className="text-slate-400 mt-1">
-                  ou em até <span className="font-bold text-slate-600">3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> sem juros no cartão de crédito.
-                </div>
+            <div className="text-sm text-slate-500 font-medium leading-relaxed">
+              <div className="text-[#5B8FB9] font-bold text-lg flex items-center">
+                R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no PIX
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 uppercase tracking-wider">5% de desconto</span>
               </div>
-            )}
+              <div className="text-slate-400 mt-1">
+                ou em até <span className="font-bold text-slate-600">3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span> sem juros no cartão de crédito.
+              </div>
+            </div>
           </div>
 
-          {/* Interactive Actions - Quantity selectors and add button */}
-          {product.estoque > 0 ? (
-            <div className="space-y-4 pt-2">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                {/* Quantity input */}
-                <div className="flex items-center border border-slate-100 rounded-full h-12 bg-slate-50 w-full sm:w-auto px-4 justify-between">
-                  <span className="text-[10px] text-slate-400 font-bold pr-4 uppercase tracking-widest">Qtd</span>
-                  <div className="flex items-center space-x-4">
-                    <button
-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="text-slate-400 hover:text-slate-800 p-1 font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="text-xs font-bold text-slate-800 w-6 text-center">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(q => Math.min(product.estoque, q + 1))}
-                      className="text-slate-400 hover:text-slate-800 p-1 font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Buy button */}
-                <button
-                  id="details-buy-now-btn"
-                  onClick={handleBuyNow}
-                  className="w-full h-12 bg-brand-blue hover:bg-brand-blue-hover text-slate-800 text-xs font-bold uppercase tracking-widest rounded-full flex items-center justify-center transition-all cursor-pointer shadow-xs"
-                >
-                  <ShoppingBag size={14} className="mr-2" />
-                  Comprar Agora
-                </button>
+          {/* Delivery notice for on-order products */}
+          {product.estoque <= 0 && (
+            <div className="p-3.5 bg-amber-50/70 border border-amber-200/60 rounded-2xl flex items-start space-x-2.5 text-xs text-amber-900 leading-relaxed">
+              <Clock size={16} className="text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block uppercase tracking-wider text-[11px] text-amber-800">Produto por Pedido</span>
+                <span>Este produto é encomendado especialmente para você. Prazo de entrega de <strong>5 a 15 dias</strong>, a confirmar com a vendedora. Você pode fazer o pedido normalmente!</span>
               </div>
-
-              {/* Auxiliary buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button
-                  id="details-add-to-cart-btn"
-                  onClick={handleAddToCart}
-                  className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
-                >
-                  Adicionar ao Carrinho
-                </button>
-                <button
-                  id="details-favorite-btn"
-                  onClick={() => toggleFavorite(product.id)}
-                  className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
-                >
-                  <Heart size={12} className={`mr-1.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
-                  {isFav ? 'Favoritado' : 'Favoritar'}
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
-                >
-                  <Share2 size={12} className="mr-1.5 text-slate-400" />
-                  Compartilhar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="pt-2">
-              <a
-                href={`https://wa.me/${config.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(isPreOrder ? `Olá! Gostaria de encomendar o perfume: ${product.nome} (${product.volume})` : `Olá! Gostaria de saber da previsão de estoque do perfume: ${product.nome} (${product.volume})`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`w-full h-12 ${isPreOrder ? 'bg-amber-100 text-amber-800' : 'bg-[#DCEEFF] text-slate-800'} text-xs font-bold uppercase tracking-widest rounded-full flex items-center justify-center transition-all shadow-xs`}
-              >
-                <MessageSquare size={14} className={`mr-2 ${isPreOrder ? 'text-amber-600' : 'text-brand-blue-dark'} animate-pulse`} />
-                {isPreOrder ? 'Encomendar pelo WhatsApp' : 'Avise-me quando chegar'}
-              </a>
             </div>
           )}
+
+          {/* Interactive Actions - Quantity selectors and add button */}
+          <div className="space-y-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {/* Quantity input */}
+              <div className="flex items-center border border-slate-100 rounded-full h-12 bg-slate-50 w-full sm:w-auto px-4 justify-between">
+                <span className="text-[10px] text-slate-400 font-bold pr-4 uppercase tracking-widest">Qtd</span>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="text-slate-400 hover:text-slate-800 p-1 font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs font-bold text-slate-800 w-6 text-center">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(q => (product.estoque > 0 ? Math.min(product.estoque, q + 1) : q + 1))}
+                    className="text-slate-400 hover:text-slate-800 p-1 font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Buy button */}
+              <button
+                id="details-buy-now-btn"
+                onClick={handleBuyNow}
+                className="w-full h-12 bg-brand-blue hover:bg-brand-blue-hover text-slate-800 text-xs font-bold uppercase tracking-widest rounded-full flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              >
+                <ShoppingBag size={14} className="mr-2" />
+                Comprar Agora
+              </button>
+            </div>
+
+            {/* Auxiliary buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                id="details-add-to-cart-btn"
+                onClick={handleAddToCart}
+                className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
+              >
+                Adicionar ao Carrinho
+              </button>
+              <button
+                id="details-favorite-btn"
+                onClick={() => toggleFavorite(product.id)}
+                className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
+              >
+                <Heart size={12} className={`mr-1.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+                {isFav ? 'Favoritado' : 'Favoritar'}
+              </button>
+              <button
+                onClick={handleShare}
+                className="w-full py-3 border border-slate-100 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider rounded-full flex items-center justify-center cursor-pointer"
+              >
+                <Share2 size={12} className="mr-1.5 text-slate-400" />
+                Compartilhar
+              </button>
+            </div>
+          </div>
 
           {/* Secure purchase information indicators */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-5 text-[11px] text-slate-500 font-medium uppercase tracking-wider">
@@ -398,7 +384,7 @@ export const ProductDetails: React.FC = () => {
 
           {activeTab === 'envio' && (
             <div className="space-y-3">
-              <p>📍 Entregas para a cidade de <span className="font-medium text-gray-800">São Paulo e região metropolitana</span> são despachadas via motoboy no mesmo dia ou dia útil seguinte.</p>
+              <p>📍 Entregas para <span className="font-medium text-gray-800">Guaraci-SP e Região</span> a combinar.</p>
               <p>🚚 Para outras localidades e cidades, enviamos via Correios com seguro total de extravio.</p>
               <p>💬 Dúvidas sobre a fixação, notas olfativas de topo ou coração? Clique no botão do WhatsApp na barra inferior e fale imediatamente com um especialista.</p>
             </div>

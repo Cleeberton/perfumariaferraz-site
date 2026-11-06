@@ -36,15 +36,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const installmentValue = currentPrice / 3;
   const pixPrice = currentPrice * 0.95;
 
-  const isPreOrder = product.preço === 0 && product.estoque === 0;
-  
   const handleQuickBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isPreOrder) {
-      window.open(`https://wa.me/${config.whatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de encomendar o perfume ${product.nome}.`, '_blank');
-      return;
-    }
     addToCart(product, 1);
     // Force open cart by navigating or triggering a custom click event or standard redirect
     const cartButton = document.getElementById('cart-drawer-toggle');
@@ -56,10 +50,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isPreOrder) {
-      window.open(`https://wa.me/${config.whatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de encomendar o perfume ${product.nome}.`, '_blank');
-      return;
-    }
     addToCart(product, 1);
     const cartButton = document.getElementById('cart-drawer-toggle');
     if (cartButton) {
@@ -81,6 +71,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     >
       {/* Badges and Favorite Button */}
       <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 flex flex-col gap-1 pointer-events-none">
+        {product.estoque > 0 ? (
+          <span className="bg-emerald-100 text-emerald-800 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+            A Pronta Entrega
+          </span>
+        ) : (
+          <span className="bg-amber-100 text-amber-800 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+            Sob Pedido
+          </span>
+        )}
         {product.destaque && (
           <span className="bg-amber-100 text-amber-800 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
             Destaque
@@ -163,13 +162,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Pricing */}
         <div className="mt-auto space-y-1 sm:space-y-2">
-          {isPreOrder ? (
-            <div className="flex flex-col py-2">
-              <span className="text-xs sm:text-sm font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded w-fit uppercase tracking-wider">
-                Sob Encomenda
-              </span>
-            </div>
-          ) : hasDiscount ? (
+          {hasDiscount ? (
             <div className="flex flex-col">
               <span className="text-[9px] sm:text-[10px] text-slate-400 line-through">
                 R$ {product.preço.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -185,39 +178,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
 
           {/* Payment terms: 5% PIX discount and 3x interest-free */}
-          {!isPreOrder && (
-            <div className="text-[9px] sm:text-[10px] space-y-0.5">
-              <div className="font-semibold text-[#5B8FB9] flex flex-wrap items-center gap-0.5">
-                <span>R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-0.5 py-0.2 rounded-xs">PIX (5% OFF)</span>
-              </div>
-              <div className="text-slate-400 font-light truncate">
-                ou {maxInstallments}x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros
-              </div>
+          <div className="text-[9px] sm:text-[10px] space-y-0.5">
+            <div className="font-semibold text-[#5B8FB9] flex flex-wrap items-center gap-0.5">
+              <span>R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-0.5 py-0.2 rounded-xs">PIX (5% OFF)</span>
             </div>
-          )}
+            <div className="text-slate-400 font-light truncate">
+              ou {maxInstallments}x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros
+            </div>
+          </div>
         </div>
 
         {/* Actions Button Panel */}
-        <div className={`grid ${isPreOrder ? 'grid-cols-1' : 'grid-cols-2'} gap-1.5 mt-3 sm:mt-4`}>
-          {!isPreOrder && (
-            <button
-              id={`add-to-cart-quick-${product.id}`}
-              onClick={handleAddToCart}
-              className="flex items-center justify-center py-1.5 sm:py-2 px-1 sm:px-2 bg-slate-50 hover:bg-brand-blue/30 text-slate-700 border border-slate-100 text-[9px] sm:text-[11px] font-bold rounded-full transition-all cursor-pointer truncate"
-              title="Adicionar ao carrinho"
-            >
-              <ShoppingBag size={11} className="mr-0.5 sm:mr-1 shrink-0" />
-              <span className="truncate">Adicionar</span>
-            </button>
-          )}
+        <div className="grid grid-cols-2 gap-1.5 mt-3 sm:mt-4">
+          <button
+            id={`add-to-cart-quick-${product.id}`}
+            onClick={handleAddToCart}
+            className="flex items-center justify-center py-1.5 sm:py-2 px-1 sm:px-2 bg-slate-50 hover:bg-brand-blue/30 text-slate-700 border border-slate-100 text-[9px] sm:text-[11px] font-bold rounded-full transition-all cursor-pointer truncate"
+            title="Adicionar ao carrinho"
+          >
+            <ShoppingBag size={11} className="mr-0.5 sm:mr-1 shrink-0" />
+            <span className="truncate">Adicionar</span>
+          </button>
           
           <button
             id={`buy-now-quick-${product.id}`}
             onClick={handleQuickBuyNow}
-            className={`flex items-center justify-center py-1.5 sm:py-2 px-1 sm:px-2 ${isPreOrder ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-brand-blue text-slate-800 hover:bg-brand-blue-hover'} text-[9px] sm:text-[11px] font-bold rounded-full transition-all cursor-pointer truncate`}
+            className="flex items-center justify-center py-1.5 sm:py-2 px-1 sm:px-2 bg-brand-blue text-slate-800 hover:bg-brand-blue-hover text-[9px] sm:text-[11px] font-bold rounded-full transition-all cursor-pointer truncate"
           >
-            {isPreOrder ? 'Encomendar' : 'Comprar'}
+            Comprar
           </button>
         </div>
       </div>

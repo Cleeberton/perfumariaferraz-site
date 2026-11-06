@@ -145,7 +145,9 @@ export const Header: React.FC<HeaderProps> = ({ onCartOpen }) => {
               <Link to="/catalogo" className="hover:text-slate-900 transition-colors">Catálogo</Link>
             </li>
             <li>
-              <Link to="/encomendas" className="hover:text-slate-900 transition-colors">Encomendas</Link>
+              <Link to="/perfume-match" className="text-[#2C5E8A] font-bold hover:text-[#1E4364] transition-colors flex items-center gap-1">
+                <span>✨ Perfume Match</span>
+              </Link>
             </li>
             {['Masculino', 'Feminino', 'Importados', 'Árabes', 'Brand Collection', 'Promoções'].map((cat) => (
               <li key={cat}>
@@ -218,8 +220,8 @@ export const Header: React.FC<HeaderProps> = ({ onCartOpen }) => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/encomendas" onClick={() => setIsMobileMenuOpen(false)} className="block py-1.5 text-base font-medium text-gray-800 hover:text-brand-blue-dark">
-                      Encomendas
+                    <Link to="/perfume-match" onClick={() => setIsMobileMenuOpen(false)} className="block py-1.5 text-base font-bold text-[#2C5E8A] hover:text-[#1E4364]">
+                      ✨ Perfume Match (Consultor)
                     </Link>
                   </li>
                 </ul>

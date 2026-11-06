@@ -5,78 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { Filter, SlidersHorizontal, Search, ArrowUpDown, RefreshCw, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Helper to accurately resolve a product's gender categorization based on name and sheet data
-const getProductGender = (p: { nome: string; categoria: string; tipo?: string }): 'masculino' | 'feminino' | 'unissex' => {
-  const name = p.nome.toLowerCase();
-  const cat = p.categoria.toLowerCase();
-  const sheetTipo = (p.tipo || '').toLowerCase().trim();
-
-  // 1. Force masculine for famous masculine names or brand collections
-  if (
-    name.includes('malbec') || 
-    name.includes('club 6') || 
-    name.includes('the blend') || 
-    name.includes('sauvage') || 
-    name.includes('bleu de chanel') || 
-    name.includes('invictus') || 
-    name.includes('1 million') || 
-    name.includes('le male') || 
-    name.includes('scandal pour homme') || 
-    name.includes('ultra male') || 
-    name.includes('eros') || 
-    name.includes('pour homme') || 
-    name.includes('bad boy') || 
-    name.includes('212 vip black') || 
-    name.includes('212 men') || 
-    name.includes('ch men') || 
-    name.includes('hugo man') || 
-    name.includes('boss bottled') || 
-    name.includes('explorer') || 
-    name.includes('legend') || 
-    name.includes('club de nuit') ||
-    name.includes('asad') ||
-    name.includes('fakhar') ||
-    name.includes('9 pm') ||
-    name.includes('9pm') ||
-    name.includes('1899-12-31') ||
-    name.includes('supremacy') ||
-    name.includes('turathi') ||
-    name.includes('hawas') ||
-    name.includes('daarej')
-  ) {
-    return 'masculino';
-  }
-
-  // 2. Force feminine for famous feminine names or brand collections
-  if (
-    name.includes('la vie est belle') || 
-    name.includes('idôle') || 
-    name.includes('good girl') || 
-    name.includes('212 vip rosé') || 
-    name.includes('libre') || 
-    name.includes('black opium') || 
-    name.includes('j\'adore') || 
-    name.includes('miss dior') || 
-    name.includes('coco mademoiselle') || 
-    name.includes('chance') || 
-    name.includes('floratta') || 
-    name.includes('egeo dolce') || 
-    name.includes('lily')
-  ) {
-    return 'feminino';
-  }
-
-  // 3. Fallback to sheet tipo
-  if (sheetTipo === 'masculino') return 'masculino';
-  if (sheetTipo === 'feminino') return 'feminino';
-  if (sheetTipo === 'unisex' || sheetTipo === 'unissex') return 'unissex';
-
-  // 4. Default by category name
-  if (cat.includes('masculino')) return 'masculino';
-  if (cat.includes('feminino')) return 'feminino';
-
-  return 'unissex';
-};
+import { getProductGender } from '../utils/productGender';
 
 export const Catalog: React.FC = () => {
   const { products, isLoadingProducts } = useApp();
@@ -186,7 +115,7 @@ export const Catalog: React.FC = () => {
   };
 
   const filteredAndSortedProducts = useMemo(() => {
-    let result = products.filter(p => p.ativo);
+    let result = products.filter(p => p.ativo && p.preço > 0);
 
     // Filter by name, brand, category, description, and tipo
     if (searchText.trim()) {
@@ -240,47 +169,49 @@ export const Catalog: React.FC = () => {
       return price <= maxPrice;
     });
 
-    // Apply Sorting Option
-    switch (sortOption) {
-      case 'menor_preço':
-        result.sort((a, b) => {
-          const hasPromoA = (!!a.promoção && !!a.preçoPromocional) || (!!a.preçoPromocional && a.preçoPromocional < a.preço);
-          const priceA = hasPromoA ? a.preçoPromocional! : a.preço;
-          const hasPromoB = (!!b.promoção && !!b.preçoPromocional) || (!!b.preçoPromocional && b.preçoPromocional < b.preço);
-          const priceB = hasPromoB ? b.preçoPromocional! : b.preço;
-          return priceA - priceB;
-        });
-        break;
-      case 'maior_preço':
-        result.sort((a, b) => {
-          const hasPromoA = (!!a.promoção && !!a.preçoPromocional) || (!!a.preçoPromocional && a.preçoPromocional < a.preço);
-          const priceA = hasPromoA ? a.preçoPromocional! : a.preço;
-          const hasPromoB = (!!b.promoção && !!b.preçoPromocional) || (!!b.preçoPromocional && b.preçoPromocional < b.preço);
-          const priceB = hasPromoB ? b.preçoPromocional! : b.preço;
-          return priceB - priceA;
-        });
-        break;
-      case 'vendas': // Simulated best sellers
-        result.sort((a, b) => b.estoque - a.estoque); // Sorting by stock index as a proxy for best sellers
-        break;
-      case 'lancamentos':
-        result.sort((a, b) => (b.lançamento ? 1 : 0) - (a.lançamento ? 1 : 0));
-        break;
-      case 'promocoes':
-        result.sort((a, b) => {
-          const hasPromoA = (!!a.promoção && !!a.preçoPromocional) || (!!a.preçoPromocional && a.preçoPromocional < a.preço);
-          const hasPromoB = (!!b.promoção && !!b.preçoPromocional) || (!!b.preçoPromocional && b.preçoPromocional < b.preço);
-          return (hasPromoB ? 1 : 0) - (hasPromoA ? 1 : 0);
-        });
-        break;
-      case 'destaque':
-        result.sort((a, b) => (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0));
-        break;
-      default:
-        // default sorting / ID
-        result.sort((a, b) => b.id - a.id);
-        break;
+    // Generate pseudo-random order for default sorting: perfumes a pronta entrega / destaque aparecem primeiro, demais de forma aleatória
+    if (sortOption === 'default') {
+      const priorizados = result.filter(p => p.estoque > 0 || p.destaque);
+      const naoPriorizados = result.filter(p => p.estoque <= 0 && !p.destaque);
+
+      // Fisher-Yates shuffle on naoPriorizados
+      for (let i = naoPriorizados.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [naoPriorizados[i], naoPriorizados[j]] = [naoPriorizados[j], naoPriorizados[i]];
+      }
+
+      return [...priorizados, ...naoPriorizados];
     }
+
+    // Apply specific Sorting Options with 'destaque' always first
+    result.sort((a, b) => {
+      // 1. Destaques sempre primeiro
+      if (a.destaque && !b.destaque) return -1;
+      if (!a.destaque && b.destaque) return 1;
+
+      // 2. Aplicar a ordenação selecionada para os itens com o mesmo status de destaque
+      const hasPromoA = (!!a.promoção && !!a.preçoPromocional) || (!!a.preçoPromocional && a.preçoPromocional < a.preço);
+      const priceA = hasPromoA ? a.preçoPromocional! : a.preço;
+      const hasPromoB = (!!b.promoção && !!b.preçoPromocional) || (!!b.preçoPromocional && b.preçoPromocional < b.preço);
+      const priceB = hasPromoB ? b.preçoPromocional! : b.preço;
+
+      switch (sortOption) {
+        case 'menor_preço':
+          return priceA - priceB;
+        case 'maior_preço':
+          return priceB - priceA;
+        case 'vendas':
+          return b.estoque - a.estoque;
+        case 'lancamentos':
+          return (b.lançamento ? 1 : 0) - (a.lançamento ? 1 : 0);
+        case 'promocoes':
+          return (hasPromoB ? 1 : 0) - (hasPromoA ? 1 : 0);
+        case 'destaque':
+          return b.id - a.id;
+        default:
+          return 0;
+      }
+    });
 
     return result;
   }, [products, searchText, selectedCategory, selectedBrand, selectedTipo, maxPrice, sortOption]);
@@ -445,7 +376,7 @@ export const Catalog: React.FC = () => {
           <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-blue-dark block">Fragrâncias de Luxo</span>
           <h2 className="text-2xl font-light tracking-widest text-slate-800 uppercase mt-0.5">Catálogo Completo</h2>
           <p className="text-[11px] text-slate-400 font-mono uppercase mt-1">
-            Exibindo {filteredAndSortedProducts.length} de {products.filter(p => p.ativo).length} perfumes disponíveis
+            Exibindo {filteredAndSortedProducts.length} de {products.filter(p => p.ativo && p.preço > 0).length} perfumes disponíveis
           </p>
         </div>
 

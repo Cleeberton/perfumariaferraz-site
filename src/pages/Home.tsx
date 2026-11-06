@@ -1,77 +1,72 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { ProductCard } from '../components/ProductCard';
-import { Sparkles, ArrowRight, MessageSquare, PackageSearch } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Sparkles, ArrowRight, Wand2 } from 'lucide-react';
 
 export const Home: React.FC = () => {
-  const { products, isLoadingProducts, config } = useApp();
-  const navigate = useNavigate();
+  const { products, isLoadingProducts } = useApp();
 
-  // Filter products for featured section (only active and featured items, no slice limit)
-  const activeProducts = products.filter(p => p.ativo);
-  const featuredProducts = activeProducts.filter(p => p.destaque);
-
-  const categories = [
-    { name: 'Masculino', image: 'https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=300' },
-    { name: 'Feminino', image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=80&w=300' },
-    { name: 'Importados', image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=300' },
-    { name: 'Árabes', image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=300' },
-    { name: 'Brand Collection', image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=300' },
-    { name: 'Promoções', image: 'https://images.unsplash.com/photo-1528740564264-7a96894d418e?auto=format&fit=crop&q=80&w=300' }
-  ];
-
-  const handleCategoryClick = (categoryName: string) => {
-    if (categoryName === 'Masculino' || categoryName === 'Feminino' || categoryName === 'Unissex') {
-      navigate(`/catalogo?tipo=${encodeURIComponent(categoryName)}`);
-    } else {
-      navigate(`/catalogo?category=${encodeURIComponent(categoryName)}`);
-    }
-  };
+  // Filter products for featured section: Perfumes a pronta entrega (estoque > 0 e preço > 0)
+  const activeProducts = products.filter(p => p.ativo && p.preço > 0);
+  const featuredProducts = activeProducts.filter(p => p.estoque > 0);
 
   return (
-    <div className="space-y-16 pt-8">
-      {/* 1. ENCOMENDAS BANNER */}
+    <div className="space-y-12 pt-6 pb-16">
+      {/* HERO BANNER - PERFUME MATCH CONSULTOR VIRTUAL */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link to="/encomendas" className="block relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200/50 shadow-sm hover:shadow-md transition-all group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <PackageSearch size={120} className="text-amber-600" />
-          </div>
-          
-          <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1 sm:space-y-2">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-amber-600 flex items-center gap-1.5">
-                <Sparkles size={12} />
-                NOVIDADE
-              </span>
-              <h2 className="text-xl sm:text-2xl font-light tracking-widest text-slate-800 uppercase">
-                Perfumes sob Encomenda
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-lg">
-                Não encontrou o que procurava? Descubra nosso catálogo exclusivo de fragrâncias disponíveis para encomenda especial.
-              </p>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#DCEEFF] via-[#EAF4FF] to-white border border-[#BBDDFB]/60 p-6 sm:p-10 shadow-sm">
+          <div className="max-w-2xl space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 backdrop-blur-xs rounded-full border border-[#5B8FB9]/30 text-[#2C5E8A] text-xs font-bold uppercase tracking-widest shadow-2xs">
+              <Sparkles size={13} className="text-[#5B8FB9]" />
+              <span>Consultor Virtual Inteligente</span>
             </div>
-            
-            <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2 text-xs sm:text-sm font-bold text-amber-700 bg-amber-200/50 px-4 py-2.5 rounded-full uppercase tracking-wider group-hover:bg-amber-200 transition-colors shrink-0 mt-2 sm:mt-0">
-              <span>Ver Catálogo</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+
+            <h1 className="text-2xl sm:text-4xl font-serif font-light text-slate-800 tracking-wide uppercase leading-tight">
+              Descubra o perfume <br className="hidden sm:inline" />
+              <span className="font-semibold text-[#2C5E8A]">perfeito para você</span>
+            </h1>
+
+            <p className="text-sm sm:text-base text-slate-600 font-light leading-relaxed">
+              Responda algumas perguntas e encontre a fragrância que combina com seu estilo. Analisamos notas, ocasiões e famílias olfativas do nosso catálogo real.
+            </p>
+
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                to="/perfume-match"
+                className="inline-flex items-center justify-center px-6 py-3.5 bg-[#2C5E8A] hover:bg-[#1E4364] text-white text-xs sm:text-sm font-bold uppercase tracking-widest rounded-full transition-all shadow-md hover:shadow-lg gap-2 cursor-pointer"
+              >
+                <Wand2 size={16} />
+                <span>Descobrir meu perfume</span>
+                <ArrowRight size={16} />
+              </Link>
+
+              <Link
+                to="/catalogo"
+                className="inline-flex items-center justify-center px-6 py-3.5 bg-white/90 hover:bg-white text-slate-700 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-full border border-slate-200 transition-all cursor-pointer"
+              >
+                Ver Todo o Catálogo
+              </Link>
             </div>
           </div>
-        </Link>
+
+          <div className="hidden lg:block absolute -right-6 -bottom-8 w-72 h-72 opacity-20 pointer-events-none text-[#2C5E8A]">
+            <Sparkles size={280} strokeWidth={0.8} />
+          </div>
+        </div>
       </section>
 
-      {/* 2. FEATURED PRODUCTS (Destaque) */}
+      {/* FEATURED PRODUCTS (Pronta Entrega) */}
       {isLoadingProducts ? (
         <div className="flex justify-center py-24">
-          <span className="text-sm text-slate-400 font-light animate-pulse">Carregando fragrâncias em destaque...</span>
+          <span className="text-sm text-slate-400 font-light animate-pulse">Carregando fragrâncias...</span>
         </div>
       ) : (
         featuredProducts.length > 0 && (
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="text-center space-y-2">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-blue-dark block">Seleção Especial</span>
-              <h3 className="text-2xl font-light tracking-widest text-slate-800 uppercase">Fragrâncias em Destaque</h3>
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-emerald-700 block">Disponibilidade Imediata</span>
+              <h3 className="text-2xl font-light tracking-widest text-slate-800 uppercase">Perfumes a Pronta Entrega</h3>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-8">
@@ -82,36 +77,6 @@ export const Home: React.FC = () => {
           </section>
         )
       )}
-
-      {/* 3. CATEGORIES EXHIBIT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-16">
-        <div className="text-center space-y-2">
-          <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-blue-dark block">Navegação Expressa</span>
-          <h3 className="text-2xl font-light tracking-widest text-slate-800 uppercase">Comprar por Categoria</h3>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          {categories.map((cat) => (
-            <button
-              key={cat.name}
-              onClick={() => handleCategoryClick(cat.name)}
-              className="group flex flex-col items-center space-y-3 cursor-pointer"
-            >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border border-slate-100 bg-slate-50 shadow-xs group-hover:shadow-md group-hover:border-brand-blue-accent transition-all duration-300">
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <span className="text-xs uppercase tracking-wider font-semibold text-slate-500 group-hover:text-slate-900 transition-colors">
-                {cat.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };

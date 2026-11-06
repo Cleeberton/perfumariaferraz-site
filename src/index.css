@@ -1,23 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   
+  /* Tradicional Perfumaria Ferraz: Soft Sky Blue & Deep Elegance */
   --color-brand-blue: #DCEEFF;
-  --color-brand-blue-hover: #C5E4F8;
-  --color-brand-blue-dark: #79B4D9;
-  --color-brand-blue-accent: #A8D3F0;
-  --color-brand-soft-bg: #F8FBFE;
+  --color-brand-blue-hover: #CBE4F9;
+  --color-brand-blue-dark: #2C5E8A;
+  --color-brand-blue-accent: #5B8FB9;
+  
+  --color-brand-navy: #1E293B;
+  --color-brand-navy-dark: #0F172A;
+  --color-brand-navy-light: #334155;
+  
+  --color-brand-soft-bg: #F8FAFC;
+  --color-brand-cream: #F1F5F9;
 }
 
 body {
   font-family: var(--font-sans);
   background-color: #FFFFFF;
-  color: #1F2937;
+  color: #0F172A;
   overflow-x: hidden;
 }
 
@@ -32,12 +39,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #DCEEFF;
+  background: #E5D5B5;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8DFFF;
+  background: #C5A059;
 }
 
 .no-scrollbar::-webkit-scrollbar {

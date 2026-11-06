@@ -80,7 +80,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, s
                 }}
                 className={`w-full flex items-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#DCEEFF] text-slate-800 font-bold'
+                    ? 'bg-[#C5A059] text-[#0A1520] font-bold'
                     : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
                 }`}
               >
